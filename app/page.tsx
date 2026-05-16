@@ -2,25 +2,22 @@
 
 import { useState } from "react";
 import CalendarView from "@/components/CalendarView";
-import TodayView from "@/components/TodayView";
 import WorkView from "@/components/WorkView";
 import RecordsView from "@/components/RecordsView";
 
-type Tab = "calendar" | "today" | "work" | "records";
+type Tab = "calendar" | "work" | "records";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "calendar", label: "カレンダー", icon: "📅" },
-  { id: "today", label: "きょう", icon: "✏️" },
   { id: "work", label: "ワーク", icon: "📚" },
   { id: "records", label: "きろく", icon: "📊" },
 ];
 
 export default function Home() {
-  const [tab, setTab] = useState<Tab>("today");
+  const [tab, setTab] = useState<Tab>("calendar");
 
   return (
     <div className="min-h-screen bg-haruka-bg">
-      {/* Header */}
       <header
         className="sticky top-0 z-40 text-white text-center py-4 font-bold text-xl"
         style={{ background: "linear-gradient(135deg, #f472b6, #a855f7)" }}
@@ -28,15 +25,12 @@ export default function Home() {
         Haruka習慣アプリ
       </header>
 
-      {/* Content */}
       <main className="max-w-lg mx-auto px-4 pt-4 pb-24">
         {tab === "calendar" && <CalendarView />}
-        {tab === "today" && <TodayView />}
         {tab === "work" && <WorkView />}
         {tab === "records" && <RecordsView />}
       </main>
 
-      {/* Bottom tab bar */}
       <nav className="tab-bar">
         {TABS.map((t) => (
           <button

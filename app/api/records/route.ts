@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/records?month=2026-05  or  ?date=2026-05-15
+// GET /api/records?month=2026-05  or  ?date=2026-05-15  or  ?all=1
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const month = searchParams.get("month"); // YYYY-MM
-  const date = searchParams.get("date");   // YYYY-MM-DD
+  const month = searchParams.get("month");
+  const date = searchParams.get("date");
+  const all = searchParams.get("all");
 
   if (date) {
     const session = await prisma.studySession.findUnique({
@@ -24,13 +25,20 @@ export async function GET(req: Request) {
     return NextResponse.json(sessions);
   }
 
-  return NextResponse.json({ error: "month or date required" }, { status: 400 });
+  if (all) {
+    const sessions = await prisma.studySession.findMany({
+      include: { subjects: { include: { subject: true } } },
+      orderBy: { date: "desc" },
+    });
+    return NextResponse.json(sessions);
+  }
+
+  return NextResponse.json({ error: "month, date, or all required" }, { status: 400 });
 }
 
 // POST /api/records  — upsert a study session for a date
 export async function POST(req: Request) {
   const { date, totalMinutes, note, subjects } = await req.json();
-  // subjects: { subjectId: string; pages: number }[]
 
   const session = await prisma.studySession.upsert({
     where: { date },
